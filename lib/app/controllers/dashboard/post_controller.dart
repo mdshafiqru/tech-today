@@ -1,5 +1,8 @@
 import 'package:blog/app/models/response_status.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../constants/app_string.dart';
 import '../../constants/helper_function.dart';
@@ -9,10 +12,97 @@ import '../../service/post_service.dart';
 
 class PostController extends GetxController {
   final _postService = PostService();
+  final _imagePicker = ImagePicker();
   var allPosts = <Post>[].obs;
 
   var loadingData = false.obs;
   var likeUnlikeLoading = false.obs;
+  var creatingPost = false.obs;
+
+  String selectedCategoryId = "";
+  String title = "";
+  String description = "";
+
+  var thumbnailPath = "".obs;
+  var imagePaths = <String>[].obs;
+
+  createPost() async {
+    if (!creatingPost.value) {
+      creatingPost.value = true;
+
+      if (selectedCategoryId.isNotEmpty) {
+        if (thumbnailPath.isNotEmpty) {
+          //
+
+          final content = {
+            "title": title,
+            "description": description,
+            "categoryId": selectedCategoryId,
+          };
+
+          imagePaths.insert(0, thumbnailPath.value);
+
+          final response = await _postService.createPost(content, imagePaths);
+
+          if (response.error == null) {
+            final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+            bool success = responseStatus.success ?? false;
+
+            if (success) {
+              title = "";
+              description = "";
+              selectedCategoryId = "";
+              thumbnailPath.value = "";
+              imagePaths.clear();
+              getAllPosts();
+              Get.back();
+              creatingPost.value = false;
+            } else {
+              creatingPost.value = false;
+              showError(error: responseStatus.message ?? "");
+            }
+          } else if (response.error == UN_AUTHENTICATED) {
+            creatingPost.value = false;
+            logout();
+          } else {
+            creatingPost.value = false;
+            showError(error: "Select a thumbnail image first");
+          }
+        } else {
+          creatingPost.value = false;
+          showError(title: "Thumbnail", error: "Select a thumbnail image first");
+        }
+      } else {
+        creatingPost.value = false;
+        showError(title: "Category", error: "Select a post category first");
+      }
+    }
+  }
+
+  selectThumbnail() async {
+    var pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      thumbnailPath.value = pickedFile.path;
+    } else {
+      Get.snackbar(
+        "Not selected",
+        "No image selected.",
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  selectOtherImages() async {
+    final files = await _imagePicker.pickMultiImage();
+
+    for (var item in files) {
+      imagePaths.add(item.path);
+    }
+  }
 
   getAllPosts() async {
     loadingData.value = true;

@@ -7,6 +7,7 @@ const kBaseColor2 = Color(0xFF0777b9);
 const textColor1 = Color(0xFF6E6E6E);
 const whiteColor = Colors.white;
 const textColor2 = Colors.black87;
+const whiteBackgroundColor = Colors.white;
 
 const MaterialColor kBaseColorToDark = MaterialColor(
   0xFF159ebf, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.

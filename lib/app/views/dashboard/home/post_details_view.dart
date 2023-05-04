@@ -112,6 +112,7 @@ class PostDetailsView extends StatelessWidget {
 
   Widget _images() {
     final images = (post.images != null) || (post.images!.isNotEmpty) ? post.images as List<String> : <String>[];
+    images.insert(0, post.thumbnail ?? "");
 
     return Column(
       children: List.generate(images.length, (index) {

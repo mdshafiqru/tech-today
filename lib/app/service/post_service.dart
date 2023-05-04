@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:blog/app/models/response_status.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../constants/api_string.dart';
 import '../constants/app_string.dart';
@@ -64,6 +65,49 @@ class PostService {
         //
       } else {
         var json = jsonDecode(response.body);
+        apiResponse.error = handleError(response.statusCode, json);
+      }
+    } catch (e) {
+      apiResponse.error = SOMETHING_WENT_WRONG;
+    }
+
+    return apiResponse;
+  }
+
+  Future<ApiResponse> createPost(Map<String, dynamic> content, List<String> images) async {
+    ApiResponse apiResponse = ApiResponse();
+
+    try {
+      final token = await getToken();
+      var headers = {'Authorization': 'Bearer $token'};
+
+      var url = Uri.parse(createPostApi);
+
+      var request = http.MultipartRequest("POST", url);
+
+      request.headers.addAll(headers);
+
+      for (var img in images) {
+        String ext = img.split('.').last;
+
+        var file = await http.MultipartFile.fromPath("images", img, contentType: MediaType('image', ext));
+        request.files.add(file);
+      }
+
+      request.fields["title"] = content["title"];
+      request.fields["description"] = content["description"];
+      request.fields["categoryId"] = content["categoryId"];
+
+      final response = await request.send();
+
+      final responseData = await response.stream.toBytes();
+      final responseString = String.fromCharCodes(responseData);
+
+      final json = jsonDecode(responseString);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        apiResponse.data = ResponseStatus.fromJson(json);
+      } else {
         apiResponse.error = handleError(response.statusCode, json);
       }
     } catch (e) {
