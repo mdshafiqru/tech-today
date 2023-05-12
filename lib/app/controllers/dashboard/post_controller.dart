@@ -1,7 +1,6 @@
 import 'package:blog/app/models/response_status.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../constants/app_string.dart';

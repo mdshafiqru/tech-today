@@ -1,13 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:blog/app/constants/api_string.dart';
-import 'package:blog/app/controllers/dashboard/post_controller.dart';
+import 'package:blog/app/views/dashboard/posts/edit_post/edit_post_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../../constants/api_string.dart';
 import '../../../../constants/colors.dart';
 import '../../../../constants/helper_function.dart';
+import '../../../../controllers/dashboard/post_controller.dart';
 import '../../../../models/auth/user.dart';
 import '../../../../models/dashboard/post.dart';
 import '../../../../models/dashboard/post_category.dart';
@@ -35,7 +36,7 @@ class PostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _title(),
+              _title(context),
               SizedBox(height: 5.w),
               _name(),
               _category(),
@@ -163,7 +164,7 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _title() {
+  Widget _title(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -175,9 +176,41 @@ class PostCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        // IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
-        GestureDetector(
-          child: Icon(Icons.more_vert),
+        PopupMenuButton(
+          itemBuilder: (context) {
+            User user = post.user != null ? post.user as User : User();
+            return <PopupMenuItem>[
+              if (user.id != userId)
+                PopupMenuItem(
+                  value: "save",
+                  child: Text("Save", style: TextStyle(fontSize: 14.sp)),
+                ),
+              if (user.id == userId)
+                PopupMenuItem(
+                  value: "edit",
+                  child: Text("Edit", style: TextStyle(fontSize: 14.sp)),
+                ),
+              if (user.id == userId)
+                PopupMenuItem(
+                  value: "delete",
+                  child: Text("Delete", style: TextStyle(fontSize: 14.sp)),
+                ),
+            ];
+          },
+          onSelected: (value) {
+            switch (value) {
+              case "save":
+                // save post
+                break;
+              case "edit":
+                Get.to(() => EditPostView());
+                break;
+              case "delete":
+                // delete post
+                break;
+              default:
+            }
+          },
         ),
       ],
     );

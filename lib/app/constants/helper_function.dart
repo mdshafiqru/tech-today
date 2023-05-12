@@ -47,9 +47,14 @@ void showError({required String error, String? title}) {
   );
 }
 
+String get userId {
+  return GetStorage().read(USER_ID) ?? "";
+}
+
 void logout() {
   _storage.remove(IS_LOGGED_IN);
   _storage.remove(USER_NAME);
+  _storage.remove(USER_ID);
   _storage.remove(USER_EMAIL);
   _storage.remove(USER_AVATAR);
   _secureStorage.delete(key: AUTH_TOKEN);

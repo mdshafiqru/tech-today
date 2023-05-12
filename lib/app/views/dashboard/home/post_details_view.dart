@@ -1,26 +1,48 @@
-import 'package:blog/app/constants/api_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
+import '../../../constants/api_string.dart';
 import '../../../constants/helper_function.dart';
 import '../../../models/auth/user.dart';
 import '../../../models/dashboard/post.dart';
 import '../../../models/dashboard/post_category.dart';
+import '../posts/edit_post/edit_post_view.dart';
 
-class PostDetailsView extends StatelessWidget {
+class PostDetailsView extends StatefulWidget {
   const PostDetailsView({super.key, required this.post});
 
   final Post post;
 
   @override
+  State<PostDetailsView> createState() => _PostDetailsViewState();
+}
+
+class _PostDetailsViewState extends State<PostDetailsView> {
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final category = post.category != null ? post.category as PostCategory : PostCategory();
+    final category = widget.post.category != null ? widget.post.category as PostCategory : PostCategory();
+    final user = widget.post.user != null ? widget.post.user as User : User();
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Post Details"),
         centerTitle: true,
         elevation: 0,
+        actions: [
+          if (user.id == userId)
+            IconButton(
+              onPressed: () {
+                Get.to(() => EditPostView());
+              },
+              icon: Icon(Icons.edit_note, size: 25.sp),
+            ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -28,6 +50,8 @@ class PostDetailsView extends StatelessWidget {
           child: ListView(
             children: [
               _titleDescription(category),
+              SizedBox(height: 10.w),
+              _thumbnail(),
               SizedBox(height: 10.w),
               _images(),
               SizedBox(height: 10.w),
@@ -42,7 +66,7 @@ class PostDetailsView extends StatelessWidget {
   }
 
   Widget _commentTitle() {
-    int commentCount = post.commentCount ?? 0;
+    int commentCount = widget.post.commentCount ?? 0;
 
     return commentCount > 0
         ? Text("total ( $commentCount ) comments", style: TextStyle(fontSize: 13.sp))
@@ -54,7 +78,7 @@ class PostDetailsView extends StatelessWidget {
   }
 
   Widget _authorCard() {
-    User user = post.user != null ? post.user as User : User();
+    User user = widget.post.user != null ? widget.post.user as User : User();
 
     var avatar = user.avatar ?? "";
     var avatarLink = imageBaseUrl + avatar;
@@ -110,10 +134,24 @@ class PostDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _images() {
-    final images = (post.images != null) || (post.images!.isNotEmpty) ? post.images as List<String> : <String>[];
-    images.insert(0, post.thumbnail ?? "");
+  Widget _thumbnail() {
+    final image = (widget.post.thumbnail != null) || (widget.post.thumbnail!.isNotEmpty) ? widget.post.thumbnail as String : "";
+    String imageUrl = imageBaseUrl + image;
+    return image.isEmpty
+        ? Container()
+        : Padding(
+            padding: EdgeInsets.symmetric(vertical: 3.w),
+            child: Image.network(
+              imageUrl,
+              width: double.infinity,
+              fit: BoxFit.contain,
+            ),
+          );
+  }
 
+  Widget _images() {
+    final images = (widget.post.images != null) || (widget.post.images!.isNotEmpty) ? widget.post.images as List<String> : <String>[];
+    print(images);
     return Column(
       children: List.generate(images.length, (index) {
         String image = images[index];
@@ -137,19 +175,19 @@ class PostDetailsView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          post.title ?? "",
+          widget.post.title ?? "",
           style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
         ),
         SizedBox(height: 2.w),
         Row(
           children: [
             Expanded(child: Text(category.name ?? "", style: TextStyle(fontSize: 12.sp))),
-            Text(getCustomDate(post.createdAt ?? ""), style: TextStyle(fontSize: 12.sp)),
+            Text(getCustomDate(widget.post.createdAt ?? ""), style: TextStyle(fontSize: 12.sp)),
           ],
         ),
         SizedBox(height: 10.w),
         Text(
-          post.description ?? "",
+          widget.post.description ?? "",
           style: TextStyle(fontSize: 14.sp),
           textAlign: TextAlign.justify,
         ),

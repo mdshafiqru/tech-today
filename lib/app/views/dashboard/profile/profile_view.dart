@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../constants/helper_function.dart';
+
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
 
@@ -9,7 +11,19 @@ class ProfileView extends StatelessWidget {
       backgroundColor: Colors.blue,
       body: SafeArea(
         child: Center(
-          child: Text("Profile page"),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Profile page"),
+              SizedBox(height: 10),
+              MaterialButton(
+                onPressed: () {
+                  logout();
+                },
+                child: Text("Logout"),
+              ),
+            ],
+          ),
         ),
       ),
     );
