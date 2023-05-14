@@ -38,7 +38,7 @@ class _PostDetailsViewState extends State<PostDetailsView> {
           if (user.id == userId)
             IconButton(
               onPressed: () {
-                Get.to(() => EditPostView());
+                Get.to(() => EditPostView(post: widget.post));
               },
               icon: Icon(Icons.edit_note, size: 25.sp),
             ),
@@ -151,7 +151,7 @@ class _PostDetailsViewState extends State<PostDetailsView> {
 
   Widget _images() {
     final images = (widget.post.images != null) || (widget.post.images!.isNotEmpty) ? widget.post.images as List<String> : <String>[];
-    print(images);
+
     return Column(
       children: List.generate(images.length, (index) {
         String image = images[index];

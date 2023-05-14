@@ -203,7 +203,7 @@ class PostCard extends StatelessWidget {
                 // save post
                 break;
               case "edit":
-                Get.to(() => EditPostView());
+                Get.to(() => EditPostView(post: post));
                 break;
               case "delete":
                 // delete post
