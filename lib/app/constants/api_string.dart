@@ -24,3 +24,4 @@ const deletePostPermenanetApi = "$baseUrl/delete-post-permanent/";
 const deletedPostsApi = "$baseUrl/deleted-posts";
 const getSavedPostApi = "$baseUrl/get-saved-posts";
 const getPostsByCategoryApi = "$baseUrl/get-posts-by-category/";
+const searchPostApi = "$baseUrl/search-posts/";
