@@ -1,5 +1,6 @@
 import 'package:blog/app/constants/helper_function.dart';
 import 'package:blog/app/views/dashboard/posts/deleted_posts/deleted_posts_view.dart';
+import 'package:blog/app/views/dashboard/posts/saved_posts/saved_posts_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,6 +21,12 @@ class ProfileView extends StatelessWidget {
                   Get.to(() => DeletedPostView());
                 },
                 child: Text("Deleted Posts"),
+              ),
+              MaterialButton(
+                onPressed: () {
+                  Get.to(() => SavedPostView());
+                },
+                child: Text("All saved Posts"),
               ),
               MaterialButton(
                 onPressed: () {

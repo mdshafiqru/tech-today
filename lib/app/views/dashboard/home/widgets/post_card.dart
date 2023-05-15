@@ -20,11 +20,13 @@ class PostCard extends StatelessWidget {
     required this.post,
     required this.index,
     required this.deletedPosts,
+    required this.savedPosts,
   });
 
   final Post post;
   final int index;
   final bool deletedPosts;
+  final bool savedPosts;
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +188,10 @@ class PostCard extends StatelessWidget {
           onSelected: (value) {
             switch (value) {
               case 'save':
-                // save functionality
+                Get.find<PostController>().savePost(post.id ?? "");
+                break;
+              case 'remove':
+                Get.find<PostController>().removeSavedPost(post.id ?? "", index);
                 break;
               case 'edit':
                 Get.to(() => EditPostView(post: post));
@@ -204,10 +209,15 @@ class PostCard extends StatelessWidget {
             User owner = post.user != null ? post.user as User : User();
 
             return <PopupMenuItem>[
-              if (owner.id != userId)
+              if (owner.id != userId && !savedPosts)
                 PopupMenuItem(
                   value: 'save',
                   child: Text("Save", style: TextStyle(fontSize: 13.sp)),
+                ),
+              if (owner.id != userId && savedPosts)
+                PopupMenuItem(
+                  value: 'remove',
+                  child: Text("Remove", style: TextStyle(fontSize: 13.sp)),
                 ),
               if (owner.id == userId && !deletedPosts)
                 PopupMenuItem(

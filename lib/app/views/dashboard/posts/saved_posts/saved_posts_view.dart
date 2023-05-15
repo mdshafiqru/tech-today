@@ -8,21 +8,21 @@ import 'package:loading_indicator/loading_indicator.dart';
 import '../../../../constants/colors.dart';
 import '../../../../models/dashboard/post.dart';
 
-class DeletedPostView extends StatelessWidget {
-  const DeletedPostView({super.key});
+class SavedPostView extends StatelessWidget {
+  const SavedPostView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Deleted Posts"),
+        title: const Text("All Saved Posts"),
         centerTitle: true,
         elevation: 0,
       ),
       body: SafeArea(
         child: Obx(() {
-          var posts = Get.find<PostController>().deletedPosts;
-          bool loading = Get.find<PostController>().gettingDeletedPosts.value;
+          var posts = Get.find<PostController>().savedPosts;
+          bool loading = Get.find<PostController>().gettingSavedPosts.value;
 
           return loading
               ? Center(
@@ -37,7 +37,7 @@ class DeletedPostView extends StatelessWidget {
                 ))
               : posts.isEmpty
                   ? Center(
-                      child: Text("No deleted posts found yet!", style: TextStyle(fontSize: 14.sp)),
+                      child: Text("No saved posts found yet!", style: TextStyle(fontSize: 14.sp)),
                     )
                   : ListView(
                       children: List.generate(posts.length, (index) {
@@ -45,8 +45,8 @@ class DeletedPostView extends StatelessWidget {
                         return PostCard(
                           post: post,
                           index: index,
-                          deletedPosts: true,
-                          savedPosts: false,
+                          deletedPosts: false,
+                          savedPosts: true,
                         );
                       }),
                     );

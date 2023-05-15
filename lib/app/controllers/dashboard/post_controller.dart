@@ -16,13 +16,17 @@ class PostController extends GetxController {
   final _imagePicker = ImagePicker();
   var allPosts = <Post>[].obs;
   var deletedPosts = <Post>[].obs;
+  var savedPosts = <Post>[].obs;
 
   var loadingData = false.obs;
   var gettingDeletedPosts = false.obs;
+  var gettingSavedPosts = false.obs;
   var likeUnlikeLoading = false.obs;
   var creatingPost = false.obs;
   var updatingPost = false.obs;
   var deletingPost = false.obs;
+  var savingPost = false.obs;
+  var removingSavedPost = false.obs;
 
   var selectedCategory = "All Category".obs;
 
@@ -273,6 +277,13 @@ class PostController extends GetxController {
         bool success = responseStatus.success ?? false;
 
         if (success) {
+          Get.snackbar(
+            "Success",
+            "Post deleted successfully! You can find it in deleted posts page",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
           allPosts.removeAt(index);
           getDeletedPosts();
           deletingPost.value = false;
@@ -286,6 +297,99 @@ class PostController extends GetxController {
       } else {
         showError(error: response.error ?? "");
         deletingPost.value = false;
+      }
+    }
+  }
+
+  savePost(String postId) async {
+    if (!savingPost.value) {
+      savingPost.value = true;
+
+      final response = await _postService.savePost(postId);
+
+      if (response.error == null) {
+        final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = responseStatus.success ?? false;
+
+        if (success) {
+          getSavePosts();
+          savingPost.value = false;
+          Get.snackbar(
+            "Success",
+            "Post saved successfully!",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        } else {
+          savingPost.value = false;
+          showError(error: responseStatus.message ?? "");
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        savingPost.value = false;
+      } else {
+        showError(error: response.error ?? "");
+        savingPost.value = false;
+      }
+    }
+  }
+
+  removeSavedPost(String postId, int index) async {
+    if (!removingSavedPost.value) {
+      removingSavedPost.value = true;
+
+      final response = await _postService.removeSavedPost(postId);
+
+      if (response.error == null) {
+        final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = responseStatus.success ?? false;
+
+        if (success) {
+          removingSavedPost.value = false;
+          savedPosts.removeAt(index);
+          Get.snackbar(
+            "Success",
+            "Post removed successfully!",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        } else {
+          removingSavedPost.value = false;
+          showError(error: responseStatus.message ?? "");
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        removingSavedPost.value = false;
+      } else {
+        showError(error: response.error ?? "");
+        removingSavedPost.value = false;
+      }
+    }
+  }
+
+  getSavePosts() async {
+    if (!gettingSavedPosts.value) {
+      gettingSavedPosts.value = true;
+
+      final response = await _postService.getSavedPosts();
+
+      if (response.error == null) {
+        var postList = response.data != null ? response.data as List<dynamic> : [];
+
+        savedPosts.clear();
+        for (var item in postList) {
+          savedPosts.add(item);
+        }
+        gettingSavedPosts.value = false;
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        gettingSavedPosts.value = false;
+      } else {
+        gettingSavedPosts.value = false;
       }
     }
   }
@@ -304,6 +408,13 @@ class PostController extends GetxController {
         if (success) {
           deletedPosts.removeAt(index);
           deletingPost.value = false;
+          Get.snackbar(
+            "Success",
+            "Post deleted Permanently!",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
         } else {
           deletingPost.value = false;
           showError(error: responseStatus.message ?? "");
@@ -322,6 +433,7 @@ class PostController extends GetxController {
   void onInit() {
     getAllPosts();
     getDeletedPosts();
+    getSavePosts();
     super.onInit();
   }
 }
