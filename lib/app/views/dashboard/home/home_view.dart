@@ -58,7 +58,11 @@ class HomeView extends StatelessWidget {
                           : ListView(
                               children: List.generate(posts.length, (index) {
                                 Post post = posts[index];
-                                return PostCard(post: post, index: index);
+                                return PostCard(
+                                  post: post,
+                                  index: index,
+                                  deletedPosts: false,
+                                );
                               }),
                             );
                 }),

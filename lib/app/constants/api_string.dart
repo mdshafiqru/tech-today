@@ -16,3 +16,6 @@ const getPostsApi = "$baseUrl/post-all";
 const createPostApi = "$baseUrl/post-create";
 const editPostApi = "$baseUrl/post-edit";
 const likeUnlikeApi = "$baseUrl/like-unlike/";
+const deletePostApi = "$baseUrl/delete-post/";
+const deletePostPermenanetApi = "$baseUrl/delete-post-permanent/";
+const deletedPostsApi = "$baseUrl/deleted-posts";
