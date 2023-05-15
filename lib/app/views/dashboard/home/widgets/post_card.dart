@@ -202,6 +202,9 @@ class PostCard extends StatelessWidget {
               case 'delete_permanent':
                 Get.find<PostController>().deletePostPermanently(post.id ?? "", index);
                 break;
+              case 'restore':
+                Get.find<PostController>().restorePost(post.id ?? "", index);
+                break;
               default:
             }
           },
@@ -228,6 +231,11 @@ class PostCard extends StatelessWidget {
                 PopupMenuItem(
                   value: 'delete',
                   child: Text("Delete", style: TextStyle(fontSize: 13.sp)),
+                ),
+              if (owner.id == userId && deletedPosts)
+                PopupMenuItem(
+                  value: 'restore',
+                  child: Text("Restore", style: TextStyle(fontSize: 13.sp)),
                 ),
               if (owner.id == userId && deletedPosts)
                 PopupMenuItem(

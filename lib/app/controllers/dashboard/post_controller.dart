@@ -25,6 +25,7 @@ class PostController extends GetxController {
   var creatingPost = false.obs;
   var updatingPost = false.obs;
   var deletingPost = false.obs;
+  var restoringPost = false.obs;
   var savingPost = false.obs;
   var removingSavedPost = false.obs;
 
@@ -297,6 +298,43 @@ class PostController extends GetxController {
       } else {
         showError(error: response.error ?? "");
         deletingPost.value = false;
+      }
+    }
+  }
+
+  restorePost(String postId, int index) async {
+    if (!restoringPost.value) {
+      restoringPost.value = true;
+
+      final response = await _postService.restorePost(postId);
+
+      if (response.error == null) {
+        final responseStatus = response.data != null ? response.data as ResponseStatus : ResponseStatus();
+
+        bool success = responseStatus.success ?? false;
+
+        if (success) {
+          Get.snackbar(
+            "Success",
+            responseStatus.message ?? "",
+            colorText: Colors.white,
+            backgroundColor: Colors.black87,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+
+          deletedPosts.removeAt(index);
+          getAllPosts();
+          restoringPost.value = false;
+        } else {
+          restoringPost.value = false;
+          showError(error: responseStatus.message ?? "");
+        }
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        restoringPost.value = false;
+      } else {
+        showError(error: response.error ?? "");
+        restoringPost.value = false;
       }
     }
   }
