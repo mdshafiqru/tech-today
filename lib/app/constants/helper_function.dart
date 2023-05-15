@@ -51,6 +51,7 @@ void logout() {
   _storage.remove(IS_LOGGED_IN);
   _storage.remove(USER_NAME);
   _storage.remove(USER_EMAIL);
+  _storage.remove(USER_ID);
   _storage.remove(USER_AVATAR);
   _secureStorage.delete(key: AUTH_TOKEN);
 
@@ -94,4 +95,8 @@ getCustomDate(String date) {
   String newDate = '$newDay-$newMonth-$year';
 
   return newDate;
+}
+
+String get userId {
+  return _storage.read(USER_ID) ?? "";
 }

@@ -1,11 +1,15 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:blog/app/constants/api_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 import '../../../constants/helper_function.dart';
 import '../../../models/auth/user.dart';
 import '../../../models/dashboard/post.dart';
 import '../../../models/dashboard/post_category.dart';
+import '../posts/edit_post/edit_post_view.dart';
 
 class PostDetailsView extends StatelessWidget {
   const PostDetailsView({super.key, required this.post});
@@ -15,12 +19,22 @@ class PostDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final category = post.category != null ? post.category as PostCategory : PostCategory();
+    final owner = post.user != null ? post.user as User : User();
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Post Details"),
         centerTitle: true,
         elevation: 0,
+        actions: [
+          if (owner.id == userId)
+            IconButton(
+              onPressed: () {
+                Get.to(() => EditPostView());
+              },
+              icon: Icon(Icons.edit_note),
+            ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -29,6 +43,7 @@ class PostDetailsView extends StatelessWidget {
             children: [
               _titleDescription(category),
               SizedBox(height: 10.w),
+              _thumbnail(),
               _images(),
               SizedBox(height: 10.w),
               _authorCard(),
@@ -112,7 +127,6 @@ class PostDetailsView extends StatelessWidget {
 
   Widget _images() {
     final images = (post.images != null) || (post.images!.isNotEmpty) ? post.images as List<String> : <String>[];
-    images.insert(0, post.thumbnail ?? "");
 
     return Column(
       children: List.generate(images.length, (index) {
@@ -130,6 +144,21 @@ class PostDetailsView extends StatelessWidget {
               );
       }),
     );
+  }
+
+  Widget _thumbnail() {
+    final image = post.thumbnail != null ? post.thumbnail as String : "";
+    final imageUrl = imageBaseUrl + image;
+    return image.isEmpty
+        ? Container()
+        : Padding(
+            padding: EdgeInsets.symmetric(vertical: 3.w),
+            child: Image.network(
+              imageUrl,
+              width: double.infinity,
+              fit: BoxFit.contain,
+            ),
+          );
   }
 
   Widget _titleDescription(PostCategory category) {

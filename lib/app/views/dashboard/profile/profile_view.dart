@@ -1,3 +1,4 @@
+import 'package:blog/app/constants/helper_function.dart';
 import 'package:flutter/material.dart';
 
 class ProfileView extends StatelessWidget {
@@ -9,7 +10,18 @@ class ProfileView extends StatelessWidget {
       backgroundColor: Colors.blue,
       body: SafeArea(
         child: Center(
-          child: Text("Profile page"),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Profile page"),
+              MaterialButton(
+                onPressed: () {
+                  logout();
+                },
+                child: Text("Logout"),
+              ),
+            ],
+          ),
         ),
       ),
     );
