@@ -47,6 +47,32 @@ class PostController extends GetxController {
   var thumbnailPath = "".obs;
   var imagePaths = <String>[].obs;
 
+  getPostsByCategory(String categoryId) async {
+    if (categoryId.isEmpty) {
+      getAllPosts();
+    } else {
+      if (!loadingData.value) {
+        loadingData.value = true;
+
+        final response = await _postService.getPostsByCategory(categoryId);
+
+        if (response.error == null) {
+          var postList = response.data != null ? response.data as List<dynamic> : [];
+          allPosts.clear();
+          for (var item in postList) {
+            allPosts.add(item);
+          }
+          loadingData.value = false;
+        } else if (response.error == UN_AUTHENTICATED) {
+          logout();
+          loadingData.value = false;
+        } else {
+          loadingData.value = false;
+        }
+      }
+    }
+  }
+
   createPost() async {
     if (!creatingPost.value) {
       creatingPost.value = true;

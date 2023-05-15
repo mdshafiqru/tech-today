@@ -1,3 +1,4 @@
+import 'package:blog/app/controllers/dashboard/post_controller.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,6 +34,7 @@ class CategoryDropdown extends StatelessWidget {
               break;
             }
           }
+          Get.find<PostController>().getPostsByCategory(selectedId);
         },
       );
     });
