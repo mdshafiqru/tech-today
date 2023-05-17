@@ -32,7 +32,11 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => PostDetailsView(post: post, deletedPost: deletedPosts));
+        Get.to(() => PostDetailsView(
+              post: post,
+              deletedPost: deletedPosts,
+              postIndex: index,
+            ));
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -87,7 +91,13 @@ class PostCard extends StatelessWidget {
         ),
         Expanded(
           child: MaterialButton(
-            onPressed: () {},
+            onPressed: () {
+              Get.to(() => PostDetailsView(
+                    post: post,
+                    deletedPost: deletedPosts,
+                    postIndex: index,
+                  ));
+            },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

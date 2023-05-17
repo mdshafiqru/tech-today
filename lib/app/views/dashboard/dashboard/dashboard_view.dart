@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../constants/colors.dart';
+import '../../../controllers/dashboard/comment_controller.dart';
 import '../../../controllers/dashboard/home_controller.dart';
 import '../../../controllers/dashboard/post_controller.dart';
 import '../home/home_view.dart';
@@ -22,6 +23,7 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   final _homeController = Get.put(HomeController());
   final _postController = Get.put(PostController());
+  final _commentController = Get.put(CommentController());
 
   int selectedIndex = 0;
 

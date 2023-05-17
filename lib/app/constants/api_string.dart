@@ -25,3 +25,8 @@ const deletedPostsApi = "$baseUrl/deleted-posts";
 const getSavedPostApi = "$baseUrl/get-saved-posts";
 const getPostsByCategoryApi = "$baseUrl/get-posts-by-category/";
 const searchPostApi = "$baseUrl/search-posts/";
+
+// comments
+const getCommentsApi = "$baseUrl/get-comments/";
+const createCommentApi = "$baseUrl/create-comment";
+const deleteCommentApi = "$baseUrl/delete-comment/";
