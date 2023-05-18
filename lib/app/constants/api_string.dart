@@ -30,3 +30,7 @@ const searchPostApi = "$baseUrl/search-posts/";
 const getCommentsApi = "$baseUrl/get-comments/";
 const createCommentApi = "$baseUrl/create-comment";
 const deleteCommentApi = "$baseUrl/delete-comment/";
+
+const getRepliesApi = "$baseUrl/get-replies/";
+const createReplyApi = "$baseUrl/create-reply";
+const deleteReplyApi = "$baseUrl/delete-reply/";

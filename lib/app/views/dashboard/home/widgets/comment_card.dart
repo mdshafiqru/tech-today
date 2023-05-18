@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../../constants/colors.dart';
 import '../../../../constants/helper_function.dart';
 import '../../../../models/auth/user.dart';
 import '../../../../models/dashboard/comment.dart';
+import 'reply_card.dart';
 
-class CommentCard extends StatelessWidget {
+class CommentCard extends StatefulWidget {
   const CommentCard({
     super.key,
     required this.comment,
@@ -22,8 +24,23 @@ class CommentCard extends StatelessWidget {
   final int commentIndex, postIndex;
 
   @override
+  State<CommentCard> createState() => _CommentCardState();
+}
+
+class _CommentCardState extends State<CommentCard> {
+  final _replyKey = GlobalKey<FormState>();
+
+  final _replyController = TextEditingController();
+
+  @override
+  void dispose() {
+    _replyController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    User user = comment.user != null ? comment.user as User : User();
+    User user = widget.comment.user != null ? widget.comment.user as User : User();
 
     String avatar = user.avatar ?? "";
     String avatarUrl = imageBaseUrl + avatar;
@@ -64,25 +81,38 @@ class CommentCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        comment.text ?? "",
+                        widget.comment.text ?? "",
                         style: TextStyle(fontSize: 13.sp),
                       ),
                       SizedBox(height: 5.w),
                       Row(
                         children: [
-                          Text(getTimeAgo(comment.createdAt ?? "")),
+                          Text(getTimeAgo(widget.comment.createdAt ?? "")),
                           SizedBox(width: 10.w),
                           Text("|"),
                           SizedBox(width: 10.w),
-                          Text(
-                            "${comment.replyCount ?? 0} replies",
-                            style: TextStyle(fontSize: 11.sp),
+                          //getReplies
+                          GestureDetector(
+                            onTap: () {
+                              final controller = Get.find<CommentController>();
+                              controller.selectedCommentIndex.value = widget.commentIndex;
+                              controller.showReply.value = !Get.find<CommentController>().showReply.value;
+                              controller.getReplies(widget.comment.id ?? "");
+                            },
+                            child: Text(
+                              "${widget.comment.replyCount ?? 0} replies",
+                              style: TextStyle(fontSize: 11.sp),
+                            ),
                           ),
                           SizedBox(width: 10.w),
                           Text("|"),
                           SizedBox(width: 10.w),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Get.find<CommentController>().showReply.value = !Get.find<CommentController>().showReply.value;
+                              Get.find<CommentController>().showReplyEntry.value = !Get.find<CommentController>().showReplyEntry.value;
+                              Get.find<CommentController>().selectedCommentIndex.value = widget.commentIndex;
+                            },
                             child: Text(
                               "reply",
                               style: TextStyle(
@@ -97,7 +127,7 @@ class CommentCard extends StatelessWidget {
                           if (user.id == userId)
                             GestureDetector(
                               onTap: () {
-                                Get.find<CommentController>().deleteComment(comment.id ?? "", commentIndex, postIndex);
+                                Get.find<CommentController>().deleteComment(widget.comment.id ?? "", widget.commentIndex, widget.postIndex);
                               },
                               child: Text(
                                 "delete",
@@ -115,8 +145,94 @@ class CommentCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 5.w),
+            Padding(
+              padding: EdgeInsets.only(left: 12.w),
+              child: _replies(),
+            ),
+            SizedBox(height: 5.w),
             Divider(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _replies() {
+    return Column(
+      children: [
+        Obx(() {
+          final controller = Get.find<CommentController>();
+          var replies = controller.replies;
+          int selectedIndex = controller.selectedCommentIndex.value;
+          bool showReply = controller.showReply.value;
+
+          return selectedIndex == widget.commentIndex
+              ? showReply
+                  ? replies.isEmpty
+                      ? Container()
+                      : Column(
+                          children: List.generate(replies.length, (index) {
+                            return ReplyCard(
+                              reply: replies[index],
+                              replyIndex: index,
+                              commentIndex: widget.commentIndex,
+                            );
+                          }),
+                        )
+                  : Container()
+              : Container();
+        }),
+        Obx(() {
+          bool showReplyEntry = Get.find<CommentController>().showReplyEntry.value;
+          return showReplyEntry ? _replyEntry() : Container();
+        }),
+      ],
+    );
+  }
+
+  Widget _replyEntry() {
+    final controller = Get.find<CommentController>();
+    return Form(
+      key: _replyKey,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
+        child: TextFormField(
+          style: TextStyle(fontSize: 14.sp),
+          decoration: InputDecoration(
+            hintText: "Write a comment",
+            hintStyle: TextStyle(fontSize: 14.sp),
+            suffixIcon: IconButton(
+              onPressed: () async {
+                if (_replyKey.currentState!.validate()) {
+                  _replyKey.currentState!.save();
+                  final created = await controller.createReply(widget.comment.id ?? "", widget.commentIndex);
+
+                  if (created) {
+                    _replyController.clear();
+                    controller.replyText = "";
+                    controller.isReplyTyping.value = false;
+                  }
+                }
+              },
+              icon: Obx(() {
+                return Icon(
+                  Icons.send,
+                  color: controller.isReplyTyping.value ? kBaseColor : Colors.black87,
+                );
+              }),
+            ),
+          ),
+          controller: _replyController,
+          onSaved: (value) {
+            controller.replyText = value ?? "";
+          },
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              controller.isReplyTyping.value = true;
+            } else {
+              controller.isReplyTyping.value = false;
+            }
+          },
         ),
       ),
     );
