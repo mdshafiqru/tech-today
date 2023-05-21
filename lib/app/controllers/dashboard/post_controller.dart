@@ -10,6 +10,7 @@ import '../../constants/helper_function.dart';
 import '../../models/dashboard/like.dart';
 import '../../models/dashboard/post.dart';
 import '../../service/post_service.dart';
+import 'profile_controller.dart';
 
 class PostController extends GetxController {
   final _postService = PostService();
@@ -125,6 +126,8 @@ class PostController extends GetxController {
             bool success = responseStatus.success ?? false;
 
             if (success) {
+              int postCount = responseStatus.data != null ? responseStatus.data as int : 0;
+
               title = "";
               description = "";
               selectedCategoryId = "";
@@ -132,6 +135,7 @@ class PostController extends GetxController {
               imagePaths.clear();
               getAllPosts();
               getMyPosts();
+              Get.find<ProfileController>().user.value.postCount = postCount;
               Get.back();
               creatingPost.value = false;
             } else {
@@ -509,12 +513,16 @@ class PostController extends GetxController {
     }
   }
 
-  @override
-  void onInit() {
+  getData() {
     getAllPosts();
     getDeletedPosts();
     getSavePosts();
     getMyPosts();
+  }
+
+  @override
+  void onInit() {
+    getData();
     super.onInit();
   }
 }

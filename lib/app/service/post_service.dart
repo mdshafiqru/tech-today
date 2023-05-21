@@ -376,7 +376,12 @@ class PostService {
       final json = jsonDecode(responseString);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        apiResponse.data = ResponseStatus.fromJson(json);
+        // apiResponse.data = ResponseStatus.fromJson(json); //postCount
+        final status = ResponseStatus.fromJson(json);
+
+        status.data = json["postCount"] ?? 0;
+
+        apiResponse.data = status;
       } else {
         apiResponse.error = handleError(response.statusCode, json);
       }

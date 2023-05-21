@@ -13,6 +13,8 @@ const updatePassApi = "$baseUrl/update-pass";
 
 // profile
 const userApi = baseUrl;
+const updateProfileApi = "$baseUrl/update-profile";
+const updateProfilePhotoApi = "$baseUrl/update-profile-photo";
 
 // home
 const categoriesApi = "$baseUrl/category-all";

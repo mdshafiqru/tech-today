@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 import '../../../constants/api_string.dart';
@@ -14,6 +15,7 @@ import '../../../controllers/dashboard/profile_controller.dart';
 import '../posts/deleted_posts/deleted_posts_view.dart';
 import '../posts/my_posts/my_posts_view.dart';
 import '../posts/saved_posts/saved_posts_view.dart';
+import 'edit_profile_view.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -241,6 +243,7 @@ class _ProfileViewState extends State<ProfileView> {
         padding: EdgeInsets.all(8.0.w),
         child: Obx(() {
           final user = Get.find<ProfileController>().user.value;
+
           return SizedBox(
             width: double.infinity,
             child: Column(
@@ -257,7 +260,9 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(() => EditProfileView(user: user));
+                      },
                       icon: Icon(
                         Icons.edit_note,
                         size: 25.sp,
@@ -299,25 +304,94 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _profileImage() {
-    return Obx(() {
-      var user = Get.find<ProfileController>().user.value;
-      String avatar = user.avatar ?? "";
+    return GestureDetector(
+      onTap: () {
+        _selectProfilePhotoOption();
+      },
+      child: Obx(() {
+        var avatar = Get.find<ProfileController>().avatar.value;
 
-      String avatarUrl = imageBaseUrl + avatar;
-
-      return Container(
-        width: 80.w,
-        height: 80.w,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.transparent,
-          border: Border.all(width: 0.5.w, color: Colors.grey[400]!),
-          image: DecorationImage(
-            image: avatar.isNotEmpty ? NetworkImage(avatarUrl) : AssetImage(DEFAULT_USER_IMAGE) as ImageProvider<Object>,
+        String avatarUrl = imageBaseUrl + avatar;
+        return Container(
+          width: 80.w,
+          height: 80.w,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.transparent,
+            border: Border.all(width: 0.5.w, color: Colors.grey[400]!),
+            image: DecorationImage(
+              image: avatar.isNotEmpty ? NetworkImage(avatarUrl) : AssetImage(DEFAULT_USER_IMAGE) as ImageProvider<Object>,
+            ),
           ),
-        ),
-      );
-    });
+          child: Center(
+            child: Obx(() {
+              final controller = Get.find<ProfileController>();
+              return controller.updatingProfilePhoto.value
+                  ? SizedBox(
+                      height: 30.w,
+                      width: 30.w,
+                      child: LoadingIndicator(
+                        indicatorType: Indicator.ballSpinFadeLoader,
+                        colors: const [kBaseColor],
+                        strokeWidth: 5.w,
+                      ),
+                    )
+                  : Container();
+            }),
+          ),
+        );
+      }),
+    );
+  }
+
+  void _selectProfilePhotoOption() {
+    Get.defaultDialog(
+      title: "Select Option",
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: () {
+              Get.find<ProfileController>().selectProfilePhoto(source: ImageSource.camera);
+              Get.back();
+            },
+            child: Padding(
+              padding: EdgeInsets.only(left: 35.w),
+              child: Row(
+                children: [
+                  Icon(Icons.camera_alt),
+                  SizedBox(width: 5.w),
+                  Text(
+                    "Camera",
+                    style: TextStyle(fontSize: 15.sp),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 10.w),
+          GestureDetector(
+            onTap: () {
+              Get.find<ProfileController>().selectProfilePhoto(source: ImageSource.gallery);
+              Get.back();
+            },
+            child: Padding(
+              padding: EdgeInsets.only(left: 35.w),
+              child: Row(
+                children: [
+                  Icon(Icons.image),
+                  SizedBox(width: 5.w),
+                  Text(
+                    "Gallery",
+                    style: TextStyle(fontSize: 15.sp),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
