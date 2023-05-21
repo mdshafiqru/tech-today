@@ -17,10 +17,12 @@ class PostController extends GetxController {
   var allPosts = <Post>[].obs;
   var deletedPosts = <Post>[].obs;
   var savedPosts = <Post>[].obs;
+  var myPosts = <Post>[].obs;
 
   var loadingData = false.obs;
   var gettingDeletedPosts = false.obs;
   var gettingSavedPosts = false.obs;
+  var gettingMyPosts = false.obs;
   var likeUnlikeLoading = false.obs;
   var creatingPost = false.obs;
   var updatingPost = false.obs;
@@ -129,6 +131,7 @@ class PostController extends GetxController {
               thumbnailPath.value = "";
               imagePaths.clear();
               getAllPosts();
+              getMyPosts();
               Get.back();
               creatingPost.value = false;
             } else {
@@ -330,13 +333,6 @@ class PostController extends GetxController {
         bool success = responseStatus.success ?? false;
 
         if (success) {
-          Get.snackbar(
-            "Success",
-            "Post deleted successfully! You can find it in deleted posts page",
-            colorText: Colors.white,
-            backgroundColor: Colors.black87,
-            snackPosition: SnackPosition.BOTTOM,
-          );
           allPosts.removeAt(index);
           getDeletedPosts();
           deletingPost.value = false;
@@ -366,14 +362,6 @@ class PostController extends GetxController {
         bool success = responseStatus.success ?? false;
 
         if (success) {
-          Get.snackbar(
-            "Success",
-            responseStatus.message ?? "",
-            colorText: Colors.white,
-            backgroundColor: Colors.black87,
-            snackPosition: SnackPosition.BOTTOM,
-          );
-
           deletedPosts.removeAt(index);
           getAllPosts();
           restoringPost.value = false;
@@ -405,13 +393,6 @@ class PostController extends GetxController {
         if (success) {
           getSavePosts();
           savingPost.value = false;
-          Get.snackbar(
-            "Success",
-            "Post saved successfully!",
-            colorText: Colors.white,
-            backgroundColor: Colors.black87,
-            snackPosition: SnackPosition.BOTTOM,
-          );
         } else {
           savingPost.value = false;
           showError(error: responseStatus.message ?? "");
@@ -440,13 +421,6 @@ class PostController extends GetxController {
         if (success) {
           removingSavedPost.value = false;
           savedPosts.removeAt(index);
-          Get.snackbar(
-            "Success",
-            "Post removed successfully!",
-            colorText: Colors.white,
-            backgroundColor: Colors.black87,
-            snackPosition: SnackPosition.BOTTOM,
-          );
         } else {
           removingSavedPost.value = false;
           showError(error: responseStatus.message ?? "");
@@ -484,6 +458,29 @@ class PostController extends GetxController {
     }
   }
 
+  getMyPosts() async {
+    if (!gettingMyPosts.value) {
+      gettingMyPosts.value = true;
+
+      final response = await _postService.getMyPosts();
+
+      if (response.error == null) {
+        var postList = response.data != null ? response.data as List<dynamic> : [];
+
+        myPosts.clear();
+        for (var item in postList) {
+          myPosts.add(item);
+        }
+        gettingMyPosts.value = false;
+      } else if (response.error == UN_AUTHENTICATED) {
+        logout();
+        gettingMyPosts.value = false;
+      } else {
+        gettingMyPosts.value = false;
+      }
+    }
+  }
+
   deletePostPermanently(String postId, int index) async {
     if (!deletingPost.value) {
       deletingPost.value = true;
@@ -498,13 +495,6 @@ class PostController extends GetxController {
         if (success) {
           deletedPosts.removeAt(index);
           deletingPost.value = false;
-          Get.snackbar(
-            "Success",
-            "Post deleted Permanently!",
-            colorText: Colors.white,
-            backgroundColor: Colors.black87,
-            snackPosition: SnackPosition.BOTTOM,
-          );
         } else {
           deletingPost.value = false;
           showError(error: responseStatus.message ?? "");
@@ -524,6 +514,7 @@ class PostController extends GetxController {
     getAllPosts();
     getDeletedPosts();
     getSavePosts();
+    getMyPosts();
     super.onInit();
   }
 }

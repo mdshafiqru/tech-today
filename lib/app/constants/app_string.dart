@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 const APP_NAME = "Tech Blog";
+const DEFAULT_USER_IMAGE = "assets/images/default_user.jpg";
 const IS_LOGGED_IN = "isLoggedIn";
 const USER_LOGGED_IN = "userLoggedIn";
 const USER_NAME = "userName";

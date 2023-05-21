@@ -47,13 +47,41 @@ void showError({required String error, String? title}) {
   );
 }
 
-void logout() {
-  _storage.remove(IS_LOGGED_IN);
-  _storage.remove(USER_NAME);
-  _storage.remove(USER_EMAIL);
-  _storage.remove(USER_ID);
-  _storage.remove(USER_AVATAR);
-  _secureStorage.delete(key: AUTH_TOKEN);
+void showCustomDialog({required String message, required String title}) {
+  Get.defaultDialog(
+    title: title,
+    content: Column(
+      // mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          message,
+          style: TextStyle(fontSize: 13.sp),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 5.w),
+        MaterialButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.r),
+          ),
+          color: kBaseColor,
+          onPressed: () => Get.back(),
+          child: Text(
+            "Ok",
+            style: TextStyle(fontSize: 14.sp, color: whiteColor),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+void logout() async {
+  await _storage.remove(IS_LOGGED_IN);
+  await _storage.remove(USER_NAME);
+  await _storage.remove(USER_EMAIL);
+  await _storage.remove(USER_ID);
+  await _storage.remove(USER_AVATAR);
+  await _secureStorage.delete(key: AUTH_TOKEN);
 
   Get.offAll(() => SigninView());
 }

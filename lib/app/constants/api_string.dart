@@ -9,6 +9,10 @@ const loginApi = "$baseUrl/login";
 const registerApi = "$baseUrl/register";
 const checkResetPassApi = "$baseUrl/check-reset-pass";
 const resetPassApi = "$baseUrl/reset-pass";
+const updatePassApi = "$baseUrl/update-pass";
+
+// profile
+const userApi = baseUrl;
 
 // home
 const categoriesApi = "$baseUrl/category-all";
@@ -23,6 +27,7 @@ const removeSavePostApi = "$baseUrl/remove-saved-post/";
 const deletePostPermenanetApi = "$baseUrl/delete-post-permanent/";
 const deletedPostsApi = "$baseUrl/deleted-posts";
 const getSavedPostApi = "$baseUrl/get-saved-posts";
+const getMyPostsApi = "$baseUrl/my-posts";
 const getPostsByCategoryApi = "$baseUrl/get-posts-by-category/";
 const searchPostApi = "$baseUrl/search-posts/";
 

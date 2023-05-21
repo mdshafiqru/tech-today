@@ -94,10 +94,22 @@ class _CommentCardState extends State<CommentCard> {
                           //getReplies
                           GestureDetector(
                             onTap: () {
+                              // final controller = Get.find<CommentController>();
+                              // controller.selectedCommentIndex.value = widget.commentIndex;
+                              // controller.showReply.value = !Get.find<CommentController>().showReply.value;
+                              // controller.getReplies(widget.comment.id ?? "");
+
                               final controller = Get.find<CommentController>();
                               controller.selectedCommentIndex.value = widget.commentIndex;
-                              controller.showReply.value = !Get.find<CommentController>().showReply.value;
-                              controller.getReplies(widget.comment.id ?? "");
+
+                              if (controller.selectedCommentIndex.value == widget.commentIndex) {
+                                controller.showReply.value = !controller.showReply.value;
+                                if (controller.showReply.value) {
+                                  controller.getReplies(widget.comment.id ?? "");
+                                } else {
+                                  controller.showReplyEntry.value = false;
+                                }
+                              }
                             },
                             child: Text(
                               "${widget.comment.replyCount ?? 0} replies",
@@ -109,9 +121,22 @@ class _CommentCardState extends State<CommentCard> {
                           SizedBox(width: 10.w),
                           GestureDetector(
                             onTap: () {
-                              Get.find<CommentController>().showReply.value = !Get.find<CommentController>().showReply.value;
-                              Get.find<CommentController>().showReplyEntry.value = !Get.find<CommentController>().showReplyEntry.value;
-                              Get.find<CommentController>().selectedCommentIndex.value = widget.commentIndex;
+                              final controller = Get.find<CommentController>();
+                              controller.selectedCommentIndex.value = widget.commentIndex;
+
+                              if (controller.selectedCommentIndex.value == widget.commentIndex) {
+                                controller.showReplyEntry.value = !controller.showReplyEntry.value;
+
+                                if (controller.showReplyEntry.value) {
+                                  controller.getReplies(widget.comment.id ?? "");
+
+                                  if (!controller.showReply.value) {
+                                    controller.showReply.value = true;
+                                  }
+                                } else {
+                                  controller.showReply.value = false;
+                                }
+                              }
                             },
                             child: Text(
                               "reply",
@@ -147,7 +172,7 @@ class _CommentCardState extends State<CommentCard> {
             SizedBox(height: 5.w),
             Padding(
               padding: EdgeInsets.only(left: 12.w),
-              child: _replies(),
+              child: _replies(widget.commentIndex),
             ),
             SizedBox(height: 5.w),
             Divider(),
@@ -157,37 +182,37 @@ class _CommentCardState extends State<CommentCard> {
     );
   }
 
-  Widget _replies() {
-    return Column(
-      children: [
-        Obx(() {
-          final controller = Get.find<CommentController>();
-          var replies = controller.replies;
-          int selectedIndex = controller.selectedCommentIndex.value;
-          bool showReply = controller.showReply.value;
+  Widget _replies(int commentIndex) {
+    return Obx(() {
+      final controller = Get.find<CommentController>();
+      var replies = controller.replies;
+      int selectedIndex = controller.selectedCommentIndex.value;
+      bool showReply = controller.showReply.value;
+      bool showReplyEntry = controller.showReplyEntry.value;
 
-          return selectedIndex == widget.commentIndex
-              ? showReply
-                  ? replies.isEmpty
-                      ? Container()
-                      : Column(
-                          children: List.generate(replies.length, (index) {
-                            return ReplyCard(
-                              reply: replies[index],
-                              replyIndex: index,
-                              commentIndex: widget.commentIndex,
-                            );
-                          }),
-                        )
+      return Column(
+        children: [
+          showReply
+              ? selectedIndex == commentIndex
+                  ? Column(
+                      children: List.generate(replies.length, (index) {
+                        return ReplyCard(
+                          reply: replies[index],
+                          replyIndex: index,
+                          commentIndex: commentIndex,
+                        );
+                      }),
+                    )
                   : Container()
-              : Container();
-        }),
-        Obx(() {
-          bool showReplyEntry = Get.find<CommentController>().showReplyEntry.value;
-          return showReplyEntry ? _replyEntry() : Container();
-        }),
-      ],
-    );
+              : Container(),
+          showReplyEntry
+              ? selectedIndex == commentIndex
+                  ? _replyEntry()
+                  : Container()
+              : Container(),
+        ],
+      );
+    });
   }
 
   Widget _replyEntry() {
@@ -199,7 +224,7 @@ class _CommentCardState extends State<CommentCard> {
         child: TextFormField(
           style: TextStyle(fontSize: 14.sp),
           decoration: InputDecoration(
-            hintText: "Write a comment",
+            hintText: "Write a Reply",
             hintStyle: TextStyle(fontSize: 14.sp),
             suffixIcon: IconButton(
               onPressed: () async {
